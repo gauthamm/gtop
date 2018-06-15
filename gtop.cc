@@ -37,7 +37,7 @@ static int gpuStatsIdx;
 
 
 
-int main() {	
+int main() {
   if (getuid()) {
     std::cout << "gtop requires root privileges!" << std::endl;
     exit(1);
@@ -88,7 +88,7 @@ int main() {
   l4t_version[5] = l4tStr[29];
   l4t_version[6] = 0;
   printf("Found L4T version %s\n", l4t_version);
- 
+
   std::map<std::string, int>::const_iterator it;
   switch (tegra_chip_id) {
 	  case TX2:
@@ -98,7 +98,7 @@ int main() {
 			exit(-2);
 		}
 		cpuStatsIdx = (*it).second;
-		
+
 		it = TX2gpuIdxMap.find(l4t_version);
 		if (it == TX2gpuIdxMap.end()) {
 			std::cerr << "Error: GPU index undefined for L4T version " << l4t_version <<std::endl;
@@ -106,7 +106,7 @@ int main() {
 		}
 		gpuStatsIdx = (*it).second;
 		break;
-		
+
 	  case TX1:
 		it = TX1cpuIdxMap.find(l4t_version);
 		if (it == TX1cpuIdxMap.end()) {
@@ -114,7 +114,7 @@ int main() {
 			exit(-2);
 		}
 		cpuStatsIdx = (*it).second;
-		
+
 		it = TX1gpuIdxMap.find(l4t_version);
 		if (it == TX1gpuIdxMap.end()) {
 			std::cerr << "Error: GPU index undefined for L4T version " << l4t_version <<std::endl;
@@ -122,7 +122,7 @@ int main() {
 		}
 		gpuStatsIdx = (*it).second;
 		break;
-		
+
 	  case TK1:
 		it = TK1cpuIdxMap.find(l4t_version);
 		if (it == TK1cpuIdxMap.end()) {
@@ -130,7 +130,7 @@ int main() {
 			exit(-2);
 		}
 		cpuStatsIdx = (*it).second;
-		
+
 		it = TK1gpuIdxMap.find(l4t_version);
 		if (it == TK1gpuIdxMap.end()) {
 			std::cerr << "Error: GPU index undefined for L4T version " << l4t_version <<std::endl;
@@ -140,9 +140,9 @@ int main() {
 		break;
   }
 
- 
 
-  std::thread t(read_tegrastats); 
+
+  std::thread t(read_tegrastats);
 
   initscr();
   noecho();
@@ -187,7 +187,7 @@ int main() {
       break;
   }
 
-  { 
+  {
     std::lock_guard<std::mutex> lk(m);
     finished = true;
   }
@@ -240,11 +240,11 @@ void read_tegrastats() {
 tegrastats parse_tegrastats(const char * buffer) {
   tegrastats ts;
   ts.version = tegra_chip_id;
-  
+
   auto stats = tokenize(buffer, ' ');
 
   get_mem_stats(ts, stats.at(1));
-  
+
   int swap_offset = 0;
   if (stats.at(4) == "SWAP") {
 	  swap_offset = 4;
@@ -316,7 +316,7 @@ void get_mem_stats(tegrastats & ts, const std::string & str) {
   ts.mem_max = std::stoi(mem_max.substr(0, mem_max.size()-2));
 }
 
-void display_stats(const dimensions & d, const tegrastats & ts) {
+void display_stats(const dimensions & d __attribute__((unused)), const tegrastats & ts) {
   // CPU
   display_cpu_stats(0, ts);
 
