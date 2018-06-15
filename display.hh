@@ -41,14 +41,6 @@ struct widget {
     unsigned int val_y;
 };
 
-struct dimensions {
-    unsigned int min_x;
-    unsigned int max_x;
-
-    unsigned int min_y;
-    unsigned int max_y;
-};
-
 void display_bars(const int&, const int&, const int&);
 void display_bars(const int&, const int&, const int&, const int&);
 void display_bars(const int&);

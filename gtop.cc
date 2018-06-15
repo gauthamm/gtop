@@ -26,6 +26,7 @@ static int cpuStatsIdx;
 static int gpuStatsIdx;
 
 int main() {
+#ifndef TEGRASTATS_FAKE
     if (getuid()) {
         std::cout << "gtop requires root privileges!" << std::endl;
         exit(1);
@@ -126,6 +127,11 @@ int main() {
             gpuStatsIdx = (*it).second;
             break;
     }
+#else
+    tegra_chip_id = TX2;
+    cpuStatsIdx = 5;
+    gpuStatsIdx = 9;
+#endif
 
     std::thread t(read_tegrastats);
 
@@ -156,8 +162,7 @@ int main() {
         processed = false;
 
         // CPU, GPU, MEM STATS
-        dimensions dim_stats;
-        display_stats(dim_stats, t_stats);
+        display_stats(t_stats);
 
         // CPU USAGE CHART
         update_usage_chart(cpu_usage_buffer, t_stats.cpu_usage);
@@ -297,7 +302,7 @@ void get_mem_stats(tegrastats& ts, const std::string& str) {
     ts.mem_max = std::stoi(mem_max.substr(0, mem_max.size() - 2));
 }
 
-void display_stats(const dimensions& d __attribute__((unused)), const tegrastats& ts) {
+void display_stats(const tegrastats& ts) {
     // CPU
     display_cpu_stats(0, ts);
 

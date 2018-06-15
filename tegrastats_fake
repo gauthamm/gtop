@@ -2,6 +2,8 @@
 # Martin Kersner, m.kersner@gmail.com
 # 2017/04/21
 
+# The fake example simulates the tegrastats reading for L4T version 28-2.0 for TX2
+
 SLEEP_INTERVAL=1
 
 while true; do
