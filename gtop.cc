@@ -1,13 +1,21 @@
 // Martin Kersner, m.kersner@gmail.com
 // 2017/04/21
 
-#include <string.h>
-#include <map>
+// #define TEGRASTATS_FAKE
+
 #include "gtop.hh"
+
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <string.h>
+#include <vector>
 
 std::mutex m;
 std::condition_variable cv;
 tegrastats t_stats;
+std::vector<tegrastats> ts_vec;
+int moving_index = 0;
 
 bool processed = false;
 bool ready = false;
@@ -25,7 +33,42 @@ static const std::map<std::string, int> TX2gpuIdxMap = {std::make_pair("28-2.0",
 static int cpuStatsIdx;
 static int gpuStatsIdx;
 
-int main() {
+static void show_usage(std::string name) {
+    std::cerr << "Usage: " << name << " [-h|-w] \n"
+              << "Options:\n"
+              << "\t-h,--help\t\tShow this help message\n"
+              << "\t-w,--window WINDOW\tSpecify moving window size" << std::endl;
+}
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        ts_vec.resize(1);
+    } else {
+        for (int i = 1; i < argc; ++i) {
+            std::string arg = argv[i];
+            if ((arg == "-h") || (arg == "--help")) {
+                show_usage(argv[0]);
+                return 0;
+            } else if ((arg == "-w") || (arg == "--window")) {
+                if (i + 1 < argc) {                     // Make sure we aren't at the end of argv!
+                    int window_size = atoi(argv[++i]);  // Increment 'i' so we don't get the argument as the next argv[i].
+                    if (window_size < 1) {
+                        std::cerr << "Window size " << window_size << " is invalid, setting to default value of 1.\n";
+                        std::cerr << "Press any key to continue or ctrl+c to cancel.";
+                        std::cin.get();
+                        window_size = 1;
+                    }
+                    ts_vec.resize(window_size);
+                } else {  // Uh-oh, there was no argument to the destination option.
+                    std::cerr << "--window option requires one argument." << std::endl;
+                    return 1;
+                }
+            } else {
+                std::cerr << "Invalid Flag.";
+                return 1;
+            }
+        }
+    }
 #ifndef TEGRASTATS_FAKE
     if (getuid()) {
         std::cout << "gtop requires root privileges!" << std::endl;
@@ -165,8 +208,8 @@ int main() {
         display_stats(t_stats);
 
         // CPU USAGE CHART
-        update_usage_chart(cpu_usage_buffer, t_stats.cpu_usage);
-        display_usage_chart(10, cpu_usage_buffer);
+        // update_usage_chart(cpu_usage_buffer, t_stats.cpu_usage);
+        // display_usage_chart(10, cpu_usage_buffer);
 
         lk.unlock();
 
@@ -249,7 +292,8 @@ tegrastats parse_tegrastats(const char* buffer) {
         case TK1:  // TODO
             break;
     }
-
+    ts_vec[moving_index] = ts;
+    moving_index = (moving_index + 1) % (static_cast<int>(ts_vec.size()));
     return ts;
 }
 
@@ -304,13 +348,24 @@ void get_mem_stats(tegrastats& ts, const std::string& str) {
 
 void display_stats(const tegrastats& ts) {
     // CPU
-    display_cpu_stats(0, ts);
+    int index = 0;
+    display_cpu_stats(index, ts);
 
     // GPU
-    display_gpu_stats(ts.cpu_usage.size(), ts);
+    index += ts.cpu_usage.size();
+    display_gpu_stats(index, ts);
 
     // Memory
-    display_mem_stats(ts.cpu_usage.size() + 1, ts);
+    index++;
+    display_mem_stats(index, ts);
+
+    // Display average CPU, GPU and memory reading
+    index++;
+    display_avg_stats(index, ts_vec);
+
+    // Display max CPU, GPU and memory reading
+    index++;
+    display_max_stats(index, ts_vec);
 }
 
 void update_usage_chart(std::vector<std::vector<int>>& usage_buffer, const std::vector<int>& usage) {

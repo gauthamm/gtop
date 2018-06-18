@@ -8,6 +8,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include "utils.hh"
 
@@ -55,6 +56,8 @@ void clear_row(const int&, const int&);
 void display_cpu_stats(const int&, const tegrastats&);
 void display_gpu_stats(const int&, const tegrastats&);
 void display_mem_stats(const int&, const tegrastats&);
+void display_avg_stats(const int& row, const std::vector<tegrastats>& ts_vec);
+void display_max_stats(const int& row, const std::vector<tegrastats>& ts_vec);
 void display_usage_chart(const int&, const std::vector<std::vector<int>>);
 
 #endif  // DISPLAY_HH_

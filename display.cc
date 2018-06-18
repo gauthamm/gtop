@@ -2,6 +2,8 @@
 // 2017/04/23
 
 #include "display.hh"
+#include <numeric>
+#include <iomanip>
 
 void display_bars(const int& row, const int& col, const int& val) {
     auto b = update_bar_dims(val);
@@ -127,6 +129,51 @@ void display_gpu_stats(const int& row, const tegrastats& ts) {
 void display_mem_stats(const int& row, const tegrastats& ts) {
     mvprintw(row, 0, "Mem");
     display_mem_bars(row, BAR_OFFSET, ts.mem_usage, ts.mem_max);
+}
+
+void display_avg_stats(const int& row, const std::vector<tegrastats>& ts_vec) {
+    // TODO: In the current version until the window is full the average value displayed is wrong. Fix me.
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2);
+    stream << "Average Readings: \t";
+
+    double cpu_avg = (std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0, [](double sum, const tegrastats& ts) {
+        return sum + std::accumulate(ts.cpu_usage.begin(), ts.cpu_usage.end(), 0.0);
+    })) / static_cast<double>(ts_vec.size());
+    stream << "CPU : " << cpu_avg << "\t";
+
+    double gpu_avg = (std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0, [](int sum, const tegrastats& ts) {
+        return sum + ts.gpu_usage;
+    })) / static_cast<double>(ts_vec.size());
+    stream << "GPU : " << gpu_avg << "\t";
+
+    double mem_avg = (std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0, [](int sum, const tegrastats& ts) {
+        return sum + ts.mem_usage;
+    })) / static_cast<double>(ts_vec.size());
+    stream << "MEM : " << mem_avg << "\t";
+
+    mvprintw(row, 0, stream.str().c_str());
+}
+
+void display_max_stats(const int& row, const std::vector<tegrastats>& ts_vec) {
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2);
+    stream << "Maximum Readings: \t";
+
+    double cpu_max = std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0, [](double max, const tegrastats& ts) {
+        return std::max(max, std::accumulate(ts.cpu_usage.begin(), ts.cpu_usage.end(), 0.0));
+    });
+    stream << "CPU : " << cpu_max << "\t";
+
+    double gpu_max = std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0,
+            [](int max, const tegrastats& ts) { return std::max(max, ts.gpu_usage); });
+    stream << "GPU : " << gpu_max << "\t";
+
+    double mem_max = std::accumulate(ts_vec.begin(), ts_vec.end(), 0.0,
+            [](int max, const tegrastats& ts) { return std::max(max, ts.mem_usage); });
+    stream << "MEM : " << mem_max << "\t";
+
+    mvprintw(row, 0, stream.str().c_str());
 }
 
 void display_usage_chart(const int& row, const std::vector<std::vector<int>> cpu_usage_buffer) {
