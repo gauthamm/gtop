@@ -15,6 +15,7 @@ std::mutex m;
 std::condition_variable cv;
 tegrastats t_stats;
 std::vector<tegrastats> ts_vec;
+int window_size = 1;
 int moving_index = 0;
 
 bool processed = false;
@@ -42,7 +43,7 @@ static void show_usage(std::string name) {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        ts_vec.resize(1);
+        ts_vec.reserve(window_size);
     } else {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
@@ -51,20 +52,20 @@ int main(int argc, char* argv[]) {
                 return 0;
             } else if ((arg == "-w") || (arg == "--window")) {
                 if (i + 1 < argc) {                     // Make sure we aren't at the end of argv!
-                    int window_size = atoi(argv[++i]);  // Increment 'i' so we don't get the argument as the next argv[i].
+                    window_size = atoi(argv[++i]);  // Increment 'i' so we don't get the argument as the next argv[i].
                     if (window_size < 1) {
                         std::cerr << "Window size " << window_size << " is invalid, setting to default value of 1.\n";
-                        std::cerr << "Press any key to continue or ctrl+c to cancel.";
+                        std::cerr << "Press any key to continue or ctrl+c to cancel.\n";
                         std::cin.get();
                         window_size = 1;
                     }
-                    ts_vec.resize(window_size);
+                    ts_vec.reserve(window_size);
                 } else {  // Uh-oh, there was no argument to the destination option.
-                    std::cerr << "--window option requires one argument." << std::endl;
+                    std::cerr << "--window option requires one argument.\n" << std::endl;
                     return 1;
                 }
             } else {
-                std::cerr << "Invalid Flag.";
+                std::cerr << "Invalid Flag.\n";
                 return 1;
             }
         }
@@ -292,7 +293,12 @@ tegrastats parse_tegrastats(const char* buffer) {
         case TK1:  // TODO
             break;
     }
-    ts_vec[moving_index] = ts;
+    if (static_cast<int>(ts_vec.size()) < window_size) {
+        ts_vec.push_back(ts);
+    } else {
+        ts_vec[moving_index] = ts;
+
+    }
     moving_index = (moving_index + 1) % (static_cast<int>(ts_vec.size()));
     return ts;
 }

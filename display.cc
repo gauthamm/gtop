@@ -132,7 +132,6 @@ void display_mem_stats(const int& row, const tegrastats& ts) {
 }
 
 void display_avg_stats(const int& row, const std::vector<tegrastats>& ts_vec) {
-    // TODO: In the current version until the window is full the average value displayed is wrong. Fix me.
     std::ostringstream stream;
     stream << std::fixed << std::setprecision(2);
     stream << "Average Readings: \t";
