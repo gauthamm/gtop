@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Martin Kersner, m.kersner@gmail.com
-# 2017/04/21
+# Gautham Manoharan
+# 2018/06/29
 
-# The fake example simulates the tegrastats reading for L4T version 28-2.0 for TX2
+# The fake example simulates the tegrastats reading for L4T version 28-2.1 for TX2
 
 SLEEP_INTERVAL=1
 
 while true; do
-  echo "RAM $((RANDOM % 7853))/7853MB (lfb 651x4MB) CPU [$((RANDOM % 100))%@1996,off,$((RANDOM % 100))%@2030,off,$((RANDOM % 100))%@1997,$((RANDOM % 100))%@1997] EMC_FREQ 1%@1866 GR3D_FREQ $((RANDOM % 100))%@1300 APE 150 MTS fg 0% bg 0% BCPU@36.5C MCPU@36.5C GPU@34.5C PLL@36.5C Tboard@31C Tdiode@31.5C PMIC@100C thermal@35.4C VDD_IN 4785/4797 VDD_CPU 455/455 VDD_GPU 151/151 VDD_SOC 1063/1063 VDD_WIFI 0/0 VDD_DDR 1303/1309"
+  echo "RAM $((RANDOM % 7853))/7853MB (lfb 1523x4MB) CPU [$((RANDOM % 100))%@1996,off,$((RANDOM % 100))%@2030,off,$((RANDOM % 100))%@1997,$((RANDOM % 100))%@1997] EMC_FREQ 1%@1866 GR3D_FREQ $((RANDOM % 100))%@1300 APE 150 BCPU@36.5C MCPU@36.5C GPU@34.5C PLL@36.5C Tboard@31C Tdiode@31.5C PMIC@100C thermal@35.4C VDD_IN 2079/2098 VDD_CPU 154/154 VDD_GPU 154/154 VDD_SOC 384/384 VDD_WIFI 0/0 VDD_DDR 230/240"
   sleep $SLEEP_INTERVAL
 done

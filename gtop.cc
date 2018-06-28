@@ -28,8 +28,8 @@ static const std::map<std::string, int> TK1cpuIdxMap = {};
 static const std::map<std::string, int> TK1gpuIdxMap = {};
 static const std::map<std::string, int> TX1cpuIdxMap = {std::make_pair("28-1.0", 5)};
 static const std::map<std::string, int> TX1gpuIdxMap = {std::make_pair("28-1.0", 7)};
-static const std::map<std::string, int> TX2cpuIdxMap = {std::make_pair("28-2.0", 5)};
-static const std::map<std::string, int> TX2gpuIdxMap = {std::make_pair("28-2.0", 9)};
+static const std::map<std::string, int> TX2cpuIdxMap = {std::make_pair("28-2.1", 5)};
+static const std::map<std::string, int> TX2gpuIdxMap = {std::make_pair("28-2.1", 9)};
 
 static int cpuStatsIdx;
 static int gpuStatsIdx;
