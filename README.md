@@ -30,6 +30,12 @@ alias gtop="sudo ./$PATH_TO_GTOP_DIRECTORY/gtop"
 ```
  and don't forget to replace `$PATH_TO_GTOP_DIRECTORY`.
 
+ ## Clang Formatting
+ Clang format can be applied to the source files with
+ ```
+ clang-format-5.0 -style=file -i *.hh *.cc
+ ```
+
 ## License
 
 GNU General Public License, version 3 (GPL-3.0)
